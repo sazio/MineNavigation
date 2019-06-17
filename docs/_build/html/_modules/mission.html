@@ -1,0 +1,408 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>mission &#8212; AgentNavigation 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for mission</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; **********</span>
+<span class="sd">    mission.py</span>
+<span class="sd">    **********</span>
+
+<span class="sd">    ======================================</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># “Code is more often read than written.” --Guido Van Rossum</span>
+<span class="c1"># author : Simone Azeglio</span>
+
+<span class="kn">import</span> <span class="nn">MalmoPython</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">heuristics</span>
+
+
+<div class="viewcode-block" id="mission"><a class="viewcode-back" href="../index.html#mission.mission">[docs]</a><span class="k">class</span> <span class="nc">mission</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A class used for everything related to a mission (a run of the environment):</span>
+
+<span class="sd">            Attributes</span>
+<span class="sd">            ----------</span>
+
+<span class="sd">            Methods</span>
+<span class="sd">            -------</span>
+<span class="sd">            load(mission_file)</span>
+<span class="sd">                Load the world from XML file and create default Malmo objects</span>
+
+<span class="sd">            start()</span>
+<span class="sd">                Set client pool , client info , reset the world for each new mission, set dimensions</span>
+<span class="sd">                of the video and agent&#39;s viewpoint. Attempt to start a mission for 10 times if there&#39;s any</span>
+<span class="sd">                issue occurring, when the mission starts it keeps counting the time.</span>
+
+<span class="sd">            is_running()</span>
+<span class="sd">                return True if mission is running</span>
+
+<span class="sd">            get_observation()</span>
+<span class="sd">                loads floor grid, edge distances, current player position, and entity (e.g. diamond) position</span>
+<span class="sd">                in order to let the agent know the distance to the diamond (odor-like representation).</span>
+<span class="sd">                It also counts collected items and exports the world view in a .json file.</span>
+<span class="sd">                Agent&#39;s observation is a 3x3 grid: he&#39;s in the center and he knows only 1 block in every</span>
+<span class="sd">                possible direction</span>
+
+<span class="sd">            send_command()</span>
+<span class="sd">                Send command input to the Agent in order to perform the next move.</span>
+<span class="sd">                It even counts if the current cell is a newly explored one or not (this</span>
+<span class="sd">                will be useful in implementing the score function)</span>
+
+<span class="sd">            stop_clock()</span>
+<span class="sd">                It stops the time at the end of the mission (useful for score function based on time)</span>
+
+<span class="sd">            check_errors()</span>
+<span class="sd">                Check whether there are errors world_state. Those errors are typically related to Malmo Client</span>
+
+<span class="sd">            block_score()</span>
+<span class="sd">                The agent has to explore new blocks in order to get a better fitness, he gets a penalty by being in the same</span>
+<span class="sd">                block (no points for fitness)</span>
+
+<span class="sd">            time_score()</span>
+<span class="sd">                The agent gets one fitness point for each seconds he spend alive</span>
+
+<span class="sd">            item_score()</span>
+<span class="sd">                The agent gets some more points for each item he picks up from the ground</span>
+<span class="sd">                (1 diamond = 50 fitness points)</span>
+
+<span class="sd">            score()</span>
+<span class="sd">                Sums up block_score , time_score and item_score to get the Fitness</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">missionXML</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># XML code -- Setting up the world</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent_host</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">malmo_mission</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">malmo_mission_record</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">world_state</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent_location</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_items</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocks_traveled</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># dictionary mapping an (x,z) coordinate to the number of times the agent has been there</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="mission.load"><a class="viewcode-back" href="../index.html#mission.mission.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mission_file</span><span class="p">):</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fdopen</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>  <span class="c1"># flush print output immediately</span>
+
+        <span class="c1"># More interesting generator string: &quot;3;7,44*49,73,35:1,159:4,95:13,35:13,159:11,95:10,159:14,159:6,35:6,95:6;12;&quot;</span>
+        <span class="c1"># flat world string 3;7,220*1,5*3,2;3;,biome_1</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mission_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">xmlFile</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">missionXML</span> <span class="o">=</span> <span class="n">xmlFile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent_host</span> <span class="o">=</span> <span class="n">MalmoPython</span><span class="o">.</span><span class="n">AgentHost</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">agent_host</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ERROR:&#39;</span><span class="p">,</span><span class="n">e</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_host</span><span class="o">.</span><span class="n">getUsage</span><span class="p">())</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_host</span><span class="o">.</span><span class="n">receivedArgument</span><span class="p">(</span><span class="s2">&quot;help&quot;</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_host</span><span class="o">.</span><span class="n">getUsage</span><span class="p">())</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mission.start"><a class="viewcode-back" href="../index.html#mission.mission.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">malmo_client_pool</span> <span class="o">=</span> <span class="n">MalmoPython</span><span class="o">.</span><span class="n">ClientPool</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">malmo_client_pool</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">MalmoPython</span><span class="o">.</span><span class="n">ClientInfo</span><span class="p">(</span><span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="mi">10001</span><span class="p">))</span>  <span class="c1"># 10000 in use - try 10001</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">malmo_mission</span> <span class="o">=</span> <span class="n">MalmoPython</span><span class="o">.</span><span class="n">MissionSpec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">missionXML</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">malmo_mission</span><span class="o">.</span><span class="n">forceWorldReset</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">malmo_mission_record</span> <span class="o">=</span> <span class="n">MalmoPython</span><span class="o">.</span><span class="n">MissionRecordSpec</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">malmo_mission</span><span class="o">.</span><span class="n">requestVideo</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">malmo_mission</span><span class="o">.</span><span class="n">setViewpoint</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Attempt to start a mission:</span>
+        <span class="n">max_retries</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="k">for</span> <span class="n">retry</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_retries</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">agent_host</span><span class="o">.</span><span class="n">startMission</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">malmo_mission</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">malmo_mission_record</span> <span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">retry</span> <span class="o">==</span> <span class="n">max_retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error starting mission:&quot;</span><span class="p">,</span><span class="n">e</span><span class="p">)</span>
+                    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Loop until mission starts:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Waiting for the mission to start &quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">world_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_host</span><span class="o">.</span><span class="n">getWorldState</span><span class="p">()</span>
+
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_state</span><span class="o">.</span><span class="n">has_mission_begun</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">world_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_host</span><span class="o">.</span><span class="n">getWorldState</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_state</span><span class="o">.</span><span class="n">errors</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error:&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mission running &quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">number</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="mission.is_running"><a class="viewcode-back" href="../index.html#mission.mission.is_running">[docs]</a>    <span class="k">def</span> <span class="nf">is_running</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_state</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_state</span><span class="o">.</span><span class="n">is_mission_running</span></div>
+
+<div class="viewcode-block" id="mission.get_observation"><a class="viewcode-back" href="../index.html#mission.mission.get_observation">[docs]</a>    <span class="k">def</span> <span class="nf">get_observation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">edges</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Top&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">,</span> <span class="s2">&quot;Bottom&quot;</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">]</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_state</span><span class="o">.</span><span class="n">is_mission_running</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">world_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_host</span><span class="o">.</span><span class="n">getWorldState</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world_state</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s1">&#39;Could not load grid.&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_state</span><span class="o">.</span><span class="n">number_of_observations_since_last_state</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_state</span><span class="o">.</span><span class="n">observations</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                <span class="n">grid</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;floorAll&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="c1"># Check in the xml file --&gt; floorAll is a 3x3 grid</span>
+                <span class="n">distances</span> <span class="o">=</span> <span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;distanceFrom&#39;</span> <span class="o">+</span> <span class="n">e</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">]</span>
+                <span class="n">cell</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;cell&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="c1"># The agent has a GPS</span>
+                <span class="n">el</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;entityCoordinates&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">agent_location</span> <span class="o">=</span> <span class="n">cell</span>
+                <span class="c1"># He&#39;s gonna pick some diamonds - we want to count em all --&gt; every diamond is 50 points</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_items</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Hotbar_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_size&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)])</span>
+
+                <span class="c1">#Export Observation data -- to check for Inventory Issues -- might be related to time tho</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;symbolicView.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+                    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">outfile</span><span class="p">)</span>
+
+                <span class="k">break</span>
+
+        <span class="k">return</span> <span class="n">observation</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">distances</span><span class="p">,</span> <span class="n">cell</span><span class="p">,</span> <span class="n">el</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mission.send_command"><a class="viewcode-back" href="../index.html#mission.mission.send_command">[docs]</a>    <span class="k">def</span> <span class="nf">send_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_location</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_traveled</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">blocks_traveled</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_location</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocks_traveled</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_location</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent_host</span><span class="o">.</span><span class="n">sendCommand</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mission.stop_clock"><a class="viewcode-back" href="../index.html#mission.mission.stop_clock">[docs]</a>    <span class="k">def</span> <span class="nf">stop_clock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="mission.check_errors"><a class="viewcode-back" href="../index.html#mission.mission.check_errors">[docs]</a>    <span class="k">def</span> <span class="nf">check_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">world_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_host</span><span class="o">.</span><span class="n">getWorldState</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_state</span><span class="o">.</span><span class="n">errors</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error:&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">text</span><span class="p">)</span></div>
+
+
+
+
+    <span class="c1"># Kind of experience --&gt; If I discover new blocks I get some money --&gt; The agent has incentives to explore</span>
+<div class="viewcode-block" id="mission.block_score"><a class="viewcode-back" href="../index.html#mission.mission.block_score">[docs]</a>    <span class="k">def</span> <span class="nf">block_score</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">location</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_traveled</span><span class="p">:</span>
+            <span class="n">score</span> <span class="o">+=</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_traveled</span><span class="p">[</span><span class="n">location</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># diminishing returns for being at the same block</span>
+
+        <span class="k">return</span> <span class="n">score</span></div>
+
+
+<div class="viewcode-block" id="mission.time_score"><a class="viewcode-back" href="../index.html#mission.mission.time_score">[docs]</a>    <span class="k">def</span> <span class="nf">time_score</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        # Distance between agent and diamond --&gt; For Ground.xml - silence elseways</span>
+<span class="sd">        # &lt;DrawItem x=&quot;7&quot; y=&quot;56&quot; z=&quot;-3&quot; type=&quot;diamond&quot; /&gt;</span>
+<span class="sd">        #agent_loc = self.agent_location.replace(&#39;,&#39;, &#39;&#39;)</span>
+<span class="sd">        agent_loc = self.agent_location.replace(&quot;(&quot;, &quot;&quot;)</span>
+<span class="sd">        agent_loc = agent_loc.replace(&quot;)&quot;, &quot;&quot;)</span>
+<span class="sd">        #float_list_agent_loc=list(map(float, agent_loc.split(&#39;,&#39;)))</span>
+<span class="sd">        #list_agent_loc = list(agent_loc)</span>
+<span class="sd">        float_list_agent_loc = [float(i) for i in list_agent_loc]</span>
+<span class="sd">        print(&quot;Agent&#39;s Location&quot; + float_list_agent_loc)</span>
+
+<span class="sd">        diamond_location = [7.0, -3.0]</span>
+<span class="sd">        dist_ag_diam = heuristics.distance(float_list_agent_loc, diamond_location)</span>
+
+<span class="sd">        # Add some function related to diamonds&#39; distance --&gt; Exploring only | Think about Survival mode too</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+        <span class="c1"># Overclocking issue: x 2 because of the overclocking  if we need</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="c1"># - dist_ag_diam</span></div>
+
+
+<div class="viewcode-block" id="mission.item_score"><a class="viewcode-back" href="../index.html#mission.mission.item_score">[docs]</a>    <span class="k">def</span> <span class="nf">item_score</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_items</span></div>
+
+<div class="viewcode-block" id="mission.score"><a class="viewcode-back" href="../index.html#mission.mission.score">[docs]</a>    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item_score</span><span class="p">()</span> <span class="o">*</span> <span class="mi">50</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_score</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">block_score</span><span class="p">()</span></div></div>
+
+
+
+<div class="viewcode-block" id="observation"><a class="viewcode-back" href="../index.html#mission.observation">[docs]</a><span class="k">class</span> <span class="nc">observation</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot; A class used to represent an observation of the world:</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    set_grid: str</span>
+<span class="sd">        Extracted from the .json World File by mission.get_observation()</span>
+<span class="sd">        The grid is the actual part of the world seen by the agent</span>
+
+<span class="sd">    set_edge_distances : str</span>
+<span class="sd">        Extracted from the .json World File by mission.get_observation()</span>
+<span class="sd">        Distances from the edges of the world (The world is limited)</span>
+<span class="sd">    set_cell : str</span>
+<span class="sd">        Extracted from the .json World File by mission.get_observation()</span>
+<span class="sd">        Cell is the agent location in the world (The agent has a GPS)</span>
+<span class="sd">    set_entity_locations : str</span>
+<span class="sd">        Extracted from the .json World File by mission.get_observation()</span>
+<span class="sd">        Locations of entities (e.g. Diamonds, Zombies)</span>
+
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    at_junction()</span>
+<span class="sd">        States whether a move is plausible or not : The agent can only walk over glowstone.</span>
+<span class="sd">        This is useful in order to limit the world with another material (e.g. Lava)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_grid</span><span class="p">,</span> <span class="n">set_edge_distances</span><span class="p">,</span> <span class="n">set_cell</span><span class="p">,</span> <span class="n">set_entity_locations</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">set_grid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_distances</span> <span class="o">=</span> <span class="n">set_edge_distances</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent_cell</span> <span class="o">=</span> <span class="n">set_cell</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entity_locations</span> <span class="o">=</span> <span class="n">set_entity_locations</span>
+
+<div class="viewcode-block" id="observation.at_junction"><a class="viewcode-back" href="../index.html#mission.observation.at_junction">[docs]</a>    <span class="k">def</span> <span class="nf">at_junction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c1">#Whether a move is plausible or not</span>
+
+        <span class="n">actions_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sa">u</span><span class="s1">&#39;glowstone&#39;</span><span class="p">):</span>
+            <span class="n">actions_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;movenorth 1&#39;</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="sa">u</span><span class="s1">&#39;glowstone&#39;</span><span class="p">):</span>
+            <span class="n">actions_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;movewest 1&#39;</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="sa">u</span><span class="s1">&#39;glowstone&#39;</span><span class="p">):</span>
+            <span class="n">actions_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;moveeast 1&#39;</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">==</span> <span class="sa">u</span><span class="s1">&#39;glowstone&#39;</span><span class="p">):</span>
+            <span class="n">actions_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;movesouth 1&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">actions_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">AgentNavigation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Simone Azeglio.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
