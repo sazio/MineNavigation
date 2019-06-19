@@ -6,9 +6,9 @@
 
 		**Main file** - it runs the mission
 		
-		Basically, after loading the world (.xml file) it starts with two concatenated while statements (formally the mission is a concatenated while statement). 
-		The second one represents each run. In the end it calculates the score and it saves a .csv file (log file) by setting the score inside the algorithm. 
-		We used time.sleep(2) in order to avoid issues related to items counting (stochastics fluctuations in time are significant and most of the times the set_score 
+		Basically, after loading the world (*.xml* file) it starts with two concatenated while statements (formally the mission is a concatenated while statement).
+		The second one represents each run. In the end it calculates the score and it saves a *.csv* file (log file) by setting the selected algorithm's score.
+		We used *time.sleep(2)* in order to avoid issues related to items counting (stochastics fluctuations in time are significant and most of the times the set_score
 		function wouldn't work because of that, compromising the learning process) 
 
 """

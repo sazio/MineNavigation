@@ -1,12 +1,12 @@
+# “Code is more often read than written.” --Guido Van Rossum
+# author : Simone Azeglio
+
 """ **********
     mission.py
     **********
 
     ======================================
 """
-
-# “Code is more often read than written.” --Guido Van Rossum
-# author : Simone Azeglio
 
 import MalmoPython
 import os
@@ -27,21 +27,23 @@ class mission:
             Methods
             -------
             load(mission_file)
-                Load the world from XML file and create default Malmo objects
+                Load the world from *.xml* file and create default **Malmo** objects
 
             start()
-                Set client pool , client info , reset the world for each new mission, set dimensions
-                of the video and agent's viewpoint. Attempt to start a mission for 10 times if there's any
-                issue occurring, when the mission starts it keeps counting the time.
+                Set client pool, client info , reset the world for each new mission, set dimensions
+                of the video-window and agent's viewpoint. Attempt to start a mission for 10 times if there's any
+                issue occurring (some stochastics errors - take a look at Malmo's official documentation:
+                https://github.com/microsoft/malmo ), when the mission starts it keeps counting the time.
 
             is_running()
-                return True if mission is running
+                Check if the mission is currently running:
+                returns True if mission is running
 
             get_observation()
-                loads floor grid, edge distances, current player position, and entity (e.g. diamond) position
+                Loads floor grid, edge distances, current player position, and entity (e.g. diamond) position
                 in order to let the agent know the distance to the diamond (odor-like representation).
-                It also counts collected items and exports the world view in a .json file.
-                Agent's observation is a 3x3 grid: he's in the center and he knows only 1 block in every
+                It also counts collected items and exports the world view in a *.json* file.
+                Agent's observation is a *3x3 grid*: he's in the center and he knows only 1 block in every
                 possible direction
 
             send_command()
@@ -53,14 +55,14 @@ class mission:
                 It stops the time at the end of the mission (useful for score function based on time)
 
             check_errors()
-                Check whether there are errors world_state. Those errors are typically related to Malmo Client
+                Check whether there are errors in the mission (check *world_state* Malmo's method). Those errors are typically related to Malmo Client
 
             block_score()
-                The agent has to explore new blocks in order to get a better fitness, he gets a penalty by being in the same
+                The agent has to explore new blocks in order to get a better *fitness*, he gets a penalty by being in the same
                 block (no points for fitness)
 
             time_score()
-                The agent gets one fitness point for each seconds he spend alive
+                The agent gets one fitness point for each seconds he spends alive
 
             item_score()
                 The agent gets some more points for each item he picks up from the ground
@@ -261,28 +263,30 @@ class observation:
 
     """ A class used to represent an observation of the world:
 
-    Attributes
-    ----------
-    set_grid: str
-        Extracted from the .json World File by mission.get_observation()
-        The grid is the actual part of the world seen by the agent
+            Attributes
+            ----------
+            set_grid: str
+                Extracted from the *.json* World File by *mission.get_observation()*
+                The grid is the part of the world seen by the agent
 
-    set_edge_distances : str
-        Extracted from the .json World File by mission.get_observation()
-        Distances from the edges of the world (The world is limited)
-    set_cell : str
-        Extracted from the .json World File by mission.get_observation()
-        Cell is the agent location in the world (The agent has a GPS)
-    set_entity_locations : str
-        Extracted from the .json World File by mission.get_observation()
-        Locations of entities (e.g. Diamonds, Zombies)
+            set_edge_distances : str
+                Extracted from the *.json* World File by *mission.get_observation()*
+                Distances from the edges of the world (The world is limited)
+
+            set_cell : str
+                Extracted from the *.json* World File by *mission.get_observation()*
+                Cell is the agent location in the world (The agent has a GPS)
+
+            set_entity_locations : str
+                Extracted from the .json World File by mission.get_observation()
+                Locations of entities (e.g. Diamonds, Zombies)
 
 
-    Methods
-    -------
-    at_junction()
-        States whether a move is plausible or not : The agent can only walk over glowstone.
-        This is useful in order to limit the world with another material (e.g. Lava)
+            Methods
+            -------
+            at_junction()
+                States whether a move is plausible or not : The agent can only walk over glowstone.
+                This is useful in order to limit the world with another material (e.g. Lava)
 
     """
     def __init__(self, set_grid, set_edge_distances, set_cell, set_entity_locations):
