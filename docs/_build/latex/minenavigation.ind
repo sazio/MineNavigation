@@ -1,0 +1,120 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter A
+  \item \spxentry{algorithm}\spxextra{class in algorithms.algorithm}, \hyperpage{9}
+  \item \spxentry{algorithms.algorithm}\spxextra{module}, \hyperpage{8}
+  \item \spxentry{algorithms.genetic}\spxextra{module}, \hyperpage{9}
+  \item \spxentry{algorithms.hillclimbing}\spxextra{module}, \hyperpage{12}
+  \item \spxentry{algorithms\_list()}\spxextra{in module cli}, \hyperpage{3}
+  \item \spxentry{at\_junction()}\spxextra{mission.observation method}, \hyperpage{8}
+
+  \indexspace
+  \bigletter B
+  \item \spxentry{block\_score()}\spxextra{mission.mission method}, \hyperpage{7}
+  \item \spxentry{build\_maze\_filepath()}\spxextra{in module cli}, \hyperpage{3}
+
+  \indexspace
+  \bigletter C
+  \item \spxentry{check\_errors()}\spxextra{mission.mission method}, \hyperpage{7}
+  \item \spxentry{cli}\spxextra{module}, \hyperpage{1}
+  \item \spxentry{climber}\spxextra{class in algorithms.hillclimbing}, \hyperpage{13}
+  \item \spxentry{closest\_cardinals()}\spxextra{in module heuristics}, \hyperpage{5}
+
+  \indexspace
+  \bigletter D
+  \item \spxentry{diff()}\spxextra{in module heuristics}, \hyperpage{5}
+  \item \spxentry{distance()}\spxextra{in module heuristics}, \hyperpage{5}
+  \item \spxentry{dot()}\spxextra{in module heuristics}, \hyperpage{5}
+
+  \indexspace
+  \bigletter G
+  \item \spxentry{generate\_local\_space()}\spxextra{algorithms.hillclimbing.climber method}, 
+		\hyperpage{14}
+  \item \spxentry{genetic}\spxextra{class in algorithms.genetic}, \hyperpage{11}
+  \item \spxentry{get\_action()}\spxextra{algorithms.algorithm.algorithm method}, \hyperpage{9}
+  \item \spxentry{get\_action()}\spxextra{algorithms.genetic.genetic method}, \hyperpage{12}
+  \item \spxentry{get\_action()}\spxextra{algorithms.hillclimbing.climber method}, \hyperpage{14}
+  \item \spxentry{get\_algorithm()}\spxextra{in module cli}, \hyperpage{3}
+  \item \spxentry{get\_closest\_entity()}\spxextra{in module heuristics}, \hyperpage{5}
+  \item \spxentry{get\_observation()}\spxextra{mission.mission method}, \hyperpage{7}
+  \item \spxentry{get\_player\_location()}\spxextra{in module heuristics}, \hyperpage{5}
+
+  \indexspace
+  \bigletter H
+  \item \spxentry{heuristics}\spxextra{module}, \hyperpage{3}
+
+  \indexspace
+  \bigletter I
+  \item \spxentry{init\_eps}\spxextra{algorithms.hillclimbing.climber attribute}, \hyperpage{13}
+  \item \spxentry{is\_running()}\spxextra{mission.mission method}, \hyperpage{7}
+  \item \spxentry{item\_score()}\spxextra{mission.mission method}, \hyperpage{7}
+
+  \indexspace
+  \bigletter L
+  \item \spxentry{load()}\spxextra{mission.mission method}, \hyperpage{7}
+  \item \spxentry{location()}\spxextra{in module heuristics}, \hyperpage{5}
+
+  \indexspace
+  \bigletter M
+  \item \spxentry{magnitude()}\spxextra{in module heuristics}, \hyperpage{5}
+  \item \spxentry{maze}\spxextra{module}, \hyperpage{1}
+  \item \spxentry{mission}\spxextra{class in mission}, \hyperpage{7}
+  \item \spxentry{mission}\spxextra{module}, \hyperpage{5}
+
+  \indexspace
+  \bigletter N
+  \item \spxentry{next\_generation()}\spxextra{algorithms.genetic.genetic method}, \hyperpage{12}
+  \item \spxentry{normalize()}\spxextra{in module heuristics}, \hyperpage{5}
+
+  \indexspace
+  \bigletter O
+  \item \spxentry{observation}\spxextra{class in mission}, \hyperpage{7}
+  \item \spxentry{opposite\_direction()}\spxextra{in module heuristics}, \hyperpage{5}
+
+  \indexspace
+  \bigletter P
+  \item \spxentry{parse\_args()}\spxextra{in module cli}, \hyperpage{3}
+  \item \spxentry{pick\_next\_string()}\spxextra{algorithms.hillclimbing.climber method}, 
+		\hyperpage{14}
+  \item \spxentry{process\_score()}\spxextra{algorithms.algorithm.algorithm method}, \hyperpage{9}
+  \item \spxentry{process\_score()}\spxextra{algorithms.genetic.genetic method}, \hyperpage{12}
+  \item \spxentry{process\_score()}\spxextra{algorithms.hillclimbing.climber method}, 
+		\hyperpage{14}
+
+  \indexspace
+  \bigletter R
+  \item \spxentry{random\_direction()}\spxextra{in module heuristics}, \hyperpage{5}
+
+  \indexspace
+  \bigletter S
+  \item \spxentry{score()}\spxextra{mission.mission method}, \hyperpage{7}
+  \item \spxentry{send\_command()}\spxextra{mission.mission method}, \hyperpage{7}
+  \item \spxentry{set\_actions}\spxextra{algorithms.genetic.genetic attribute}, \hyperpage{11}
+  \item \spxentry{set\_actions}\spxextra{algorithms.hillclimbing.climber attribute}, \hyperpage{13}
+  \item \spxentry{set\_cell}\spxextra{mission.observation attribute}, \hyperpage{8}
+  \item \spxentry{set\_cooling}\spxextra{algorithms.hillclimbing.climber attribute}, \hyperpage{14}
+  \item \spxentry{set\_edge\_distances}\spxextra{mission.observation attribute}, \hyperpage{8}
+  \item \spxentry{set\_entity\_locations}\spxextra{mission.observation attribute}, \hyperpage{8}
+  \item \spxentry{set\_gen\_size}\spxextra{algorithms.genetic.genetic attribute}, \hyperpage{11}
+  \item \spxentry{set\_grid}\spxextra{mission.observation attribute}, \hyperpage{8}
+  \item \spxentry{set\_mut\_prob}\spxextra{algorithms.genetic.genetic attribute}, \hyperpage{11}
+  \item \spxentry{set\_score()}\spxextra{algorithms.algorithm.algorithm method}, \hyperpage{9}
+  \item \spxentry{set\_sel\_frac}\spxextra{algorithms.genetic.genetic attribute}, \hyperpage{11}
+  \item \spxentry{set\_str\_len}\spxextra{algorithms.genetic.genetic attribute}, \hyperpage{11}
+  \item \spxentry{start()}\spxextra{mission.mission method}, \hyperpage{7}
+  \item \spxentry{stop\_clock()}\spxextra{mission.mission method}, \hyperpage{7}
+
+  \indexspace
+  \bigletter T
+  \item \spxentry{time\_score()}\spxextra{mission.mission method}, \hyperpage{7}
+  \item \spxentry{towards\_item()}\spxextra{in module heuristics}, \hyperpage{5}
+
+  \indexspace
+  \bigletter V
+  \item \spxentry{valid\_algorithms()}\spxextra{in module cli}, \hyperpage{3}
+
+\end{sphinxtheindex}

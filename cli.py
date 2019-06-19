@@ -8,21 +8,21 @@
     Methods
     -------
         valid_algorithms()
-            Shows valid algorithms (genetic and hillclimbing so far) and description
+            Shows valid algorithms (*genetic* and *hillclimbing* so far) and description
 
         get_algorithm(alg_selected)
             Returns a strategy based on the selected algorithm
-            (alg_selected could be one of the valid algorithms)
+            (alg_selected has to be one of the valid algorithms)
 
         build_maze_filepath(maze)
-            It gets the filepath of the choosen .xml file
+            It gets the filepath of the choosen *.xml* file
 
         algorithms_list()
-            Create list of algorithms for the parse_args() method
+            Create list of algorithms for *parse_args()* method
 
         parse_args()
-            Returns a triad : world (maze), algorithm and ouput file.
-            In this way it specifies the specific configuration.
+            Returns a triad : world (maze), algorithm and output file.
+            In this way it specifies the defined configuration.
             The output file is used in order to let the agent build a memory and
             to plot the fitness function
 

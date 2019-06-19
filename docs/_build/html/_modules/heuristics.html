@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>heuristics &#8212; AgentNavigation 1.0 documentation</title>
+    <title>heuristics &#8212; MineNavigation 1.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -43,29 +43,29 @@
 <span class="sd">    Methods</span>
 <span class="sd">    -------</span>
 <span class="sd">        distance(lhs,rhs)</span>
-<span class="sd">            Calculate the distance between left-hand-side (lhs) and right-hand-side (rhs). Lhs and rhs could be </span>
-<span class="sd">            the agent and the diamond</span>
+<span class="sd">            Calculate the distance between left-hand-side (*lhs*) and right-hand-side (*rhs*).</span>
+<span class="sd">            E.g : lhs and rhs could be the agent and the diamond</span>
 <span class="sd">        </span>
 <span class="sd">        location(entity)</span>
-<span class="sd">            Define location as x,y,z triad</span>
+<span class="sd">            Define location as *x,y,z* triad</span>
 <span class="sd">             </span>
 <span class="sd">        dot(lhs,rhs)</span>
-<span class="sd">            Dot product between left-hand-side (lhs) and right-hand-side (rhs)-</span>
+<span class="sd">            Dot product between left-hand-side (*lhs*) and right-hand-side (*rhs*)</span>
 <span class="sd">        </span>
 <span class="sd">        diff(lhs,rhs)</span>
-<span class="sd">            Coordinate difference between left-hand-side (lhs) and right-hand-side (rhs)</span>
+<span class="sd">            Coordinate difference between left-hand-side (*lhs*) and right-hand-side (*rhs*)</span>
 <span class="sd">        </span>
 <span class="sd">        magnitude(vec)</span>
-<span class="sd">            Magnitude of a vector (vec) </span>
+<span class="sd">            Magnitude of a vector (*vec*)</span>
 <span class="sd">        </span>
 <span class="sd">        normalize(vec)</span>
-<span class="sd">            Normalize a vector (vec) </span>
+<span class="sd">            Normalize a vector (*vec*)</span>
 <span class="sd">        </span>
 <span class="sd">        get_player_location(el)</span>
 <span class="sd">            Returns Agent&#39;s location </span>
 <span class="sd">        </span>
 <span class="sd">        get_closest_entity(el, entity_name)</span>
-<span class="sd">            Returns distance from the closest entity </span>
+<span class="sd">            Returns the closest entity and the coordinate difference between agent and closest entity</span>
 <span class="sd">        </span>
 <span class="sd">        closest_cardinals(dir, obs)</span>
 <span class="sd">            Returns closest cardinal, in order to plan the path (dir = direction, obs = observation)</span>
@@ -221,7 +221,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">AgentNavigation</a></h1>
+<h1 class="logo"><a href="../index.html">MineNavigation</a></h1>
 
 
 

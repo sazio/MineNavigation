@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>mission &#8212; AgentNavigation 1.0 documentation</title>
+    <title>mission &#8212; MineNavigation 1.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -60,21 +60,23 @@
 <span class="sd">            Methods</span>
 <span class="sd">            -------</span>
 <span class="sd">            load(mission_file)</span>
-<span class="sd">                Load the world from XML file and create default Malmo objects</span>
+<span class="sd">                Load the world from *.xml* file and create default **Malmo** objects</span>
 
 <span class="sd">            start()</span>
-<span class="sd">                Set client pool , client info , reset the world for each new mission, set dimensions</span>
-<span class="sd">                of the video and agent&#39;s viewpoint. Attempt to start a mission for 10 times if there&#39;s any</span>
-<span class="sd">                issue occurring, when the mission starts it keeps counting the time.</span>
+<span class="sd">                Set client pool, client info , reset the world for each new mission, set dimensions</span>
+<span class="sd">                of the video-window and agent&#39;s viewpoint. Attempt to start a mission for 10 times if there&#39;s any</span>
+<span class="sd">                issue occurring (some stochastics errors - take a look at Malmo&#39;s official documentation:</span>
+<span class="sd">                https://github.com/microsoft/malmo ), when the mission starts it keeps counting the time.</span>
 
 <span class="sd">            is_running()</span>
-<span class="sd">                return True if mission is running</span>
+<span class="sd">                Check if the mission is currently running:</span>
+<span class="sd">                returns True if mission is running</span>
 
 <span class="sd">            get_observation()</span>
-<span class="sd">                loads floor grid, edge distances, current player position, and entity (e.g. diamond) position</span>
+<span class="sd">                Loads floor grid, edge distances, current player position, and entity (e.g. diamond) position</span>
 <span class="sd">                in order to let the agent know the distance to the diamond (odor-like representation).</span>
-<span class="sd">                It also counts collected items and exports the world view in a .json file.</span>
-<span class="sd">                Agent&#39;s observation is a 3x3 grid: he&#39;s in the center and he knows only 1 block in every</span>
+<span class="sd">                It also counts collected items and exports the world view in a *.json* file.</span>
+<span class="sd">                Agent&#39;s observation is a *3x3 grid*: he&#39;s in the center and he knows only 1 block in every</span>
 <span class="sd">                possible direction</span>
 
 <span class="sd">            send_command()</span>
@@ -86,14 +88,14 @@
 <span class="sd">                It stops the time at the end of the mission (useful for score function based on time)</span>
 
 <span class="sd">            check_errors()</span>
-<span class="sd">                Check whether there are errors world_state. Those errors are typically related to Malmo Client</span>
+<span class="sd">                Check whether there are errors in the mission (check *world_state* Malmo&#39;s method). Those errors are typically related to Malmo Client</span>
 
 <span class="sd">            block_score()</span>
-<span class="sd">                The agent has to explore new blocks in order to get a better fitness, he gets a penalty by being in the same</span>
+<span class="sd">                The agent has to explore new blocks in order to get a better *fitness*, he gets a penalty by being in the same</span>
 <span class="sd">                block (no points for fitness)</span>
 
 <span class="sd">            time_score()</span>
-<span class="sd">                The agent gets one fitness point for each seconds he spend alive</span>
+<span class="sd">                The agent gets one fitness point for each seconds he spends alive</span>
 
 <span class="sd">            item_score()</span>
 <span class="sd">                The agent gets some more points for each item he picks up from the ground</span>
@@ -294,28 +296,30 @@
 
     <span class="sd">&quot;&quot;&quot; A class used to represent an observation of the world:</span>
 
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    set_grid: str</span>
-<span class="sd">        Extracted from the .json World File by mission.get_observation()</span>
-<span class="sd">        The grid is the actual part of the world seen by the agent</span>
+<span class="sd">            Attributes</span>
+<span class="sd">            ----------</span>
+<span class="sd">            set_grid: str</span>
+<span class="sd">                Extracted from the *.json* World File by *mission.get_observation()*</span>
+<span class="sd">                The grid is the part of the world seen by the agent</span>
 
-<span class="sd">    set_edge_distances : str</span>
-<span class="sd">        Extracted from the .json World File by mission.get_observation()</span>
-<span class="sd">        Distances from the edges of the world (The world is limited)</span>
-<span class="sd">    set_cell : str</span>
-<span class="sd">        Extracted from the .json World File by mission.get_observation()</span>
-<span class="sd">        Cell is the agent location in the world (The agent has a GPS)</span>
-<span class="sd">    set_entity_locations : str</span>
-<span class="sd">        Extracted from the .json World File by mission.get_observation()</span>
-<span class="sd">        Locations of entities (e.g. Diamonds, Zombies)</span>
+<span class="sd">            set_edge_distances : str</span>
+<span class="sd">                Extracted from the *.json* World File by *mission.get_observation()*</span>
+<span class="sd">                Distances from the edges of the world (The world is limited)</span>
+
+<span class="sd">            set_cell : str</span>
+<span class="sd">                Extracted from the *.json* World File by *mission.get_observation()*</span>
+<span class="sd">                Cell is the agent location in the world (The agent has a GPS)</span>
+
+<span class="sd">            set_entity_locations : str</span>
+<span class="sd">                Extracted from the .json World File by mission.get_observation()</span>
+<span class="sd">                Locations of entities (e.g. Diamonds, Zombies)</span>
 
 
-<span class="sd">    Methods</span>
-<span class="sd">    -------</span>
-<span class="sd">    at_junction()</span>
-<span class="sd">        States whether a move is plausible or not : The agent can only walk over glowstone.</span>
-<span class="sd">        This is useful in order to limit the world with another material (e.g. Lava)</span>
+<span class="sd">            Methods</span>
+<span class="sd">            -------</span>
+<span class="sd">            at_junction()</span>
+<span class="sd">                States whether a move is plausible or not : The agent can only walk over glowstone.</span>
+<span class="sd">                This is useful in order to limit the world with another material (e.g. Lava)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_grid</span><span class="p">,</span> <span class="n">set_edge_distances</span><span class="p">,</span> <span class="n">set_cell</span><span class="p">,</span> <span class="n">set_entity_locations</span><span class="p">):</span>
@@ -350,7 +354,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">AgentNavigation</a></h1>
+<h1 class="logo"><a href="../index.html">MineNavigation</a></h1>
 
 
 

@@ -10,29 +10,29 @@
     Methods
     -------
         distance(lhs,rhs)
-            Calculate the distance between left-hand-side (lhs) and right-hand-side (rhs). Lhs and rhs could be 
-            the agent and the diamond
+            Calculate the distance between left-hand-side (*lhs*) and right-hand-side (*rhs*).
+            E.g : lhs and rhs could be the agent and the diamond
         
         location(entity)
-            Define location as x,y,z triad
+            Define location as *x,y,z* triad
              
         dot(lhs,rhs)
-            Dot product between left-hand-side (lhs) and right-hand-side (rhs)-
+            Dot product between left-hand-side (*lhs*) and right-hand-side (*rhs*)
         
         diff(lhs,rhs)
-            Coordinate difference between left-hand-side (lhs) and right-hand-side (rhs)
+            Coordinate difference between left-hand-side (*lhs*) and right-hand-side (*rhs*)
         
         magnitude(vec)
-            Magnitude of a vector (vec) 
+            Magnitude of a vector (*vec*)
         
         normalize(vec)
-            Normalize a vector (vec) 
+            Normalize a vector (*vec*)
         
         get_player_location(el)
             Returns Agent's location 
         
         get_closest_entity(el, entity_name)
-            Returns distance from the closest entity 
+            Returns the closest entity and the coordinate difference between agent and closest entity
         
         closest_cardinals(dir, obs)
             Returns closest cardinal, in order to plan the path (dir = direction, obs = observation)

@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>algorithms.genetic &#8212; AgentNavigation 1.0 documentation</title>
+    <title>algorithms.genetic &#8212; MineNavigation 1.0 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -39,22 +39,28 @@
 
 
 
-<span class="sd">	Pseudocode for the creation of a new population:</span>
+<span class="sd">	**Pseudocode for the creation of a new population:**</span>
+
 <span class="sd">	</span>
-<span class="sd">	fittest = four top scoring strings within the population</span>
-<span class="sd">	for i in range(population_size):</span>
-<span class="sd">  		parent1 = random.choice(fittest)</span>
-<span class="sd"> 		parent2 = random.choice(fittest)</span>
+<span class="sd">	*fittest = four top scoring strings within the population*</span>
 
-<span class="sd">  		offspring = parent1[crossover:] + parent2[:crossover]</span>
-<span class="sd">  		for heuristic in offspring:</span>
-<span class="sd">    		5% chance to mutate heuristic to another one</span>
-<span class="sd">  		population.append(offspring)</span>
+<span class="sd">	| *for i in range(population_size):*</span>
 
+<span class="sd">  		| *parent1 = random.choice(fittest)*</span>
+
+<span class="sd"> 		| *parent2 = random.choice(fittest)*</span>
+
+<span class="sd">  		| *offspring = parent1[crossover:] + parent2[:crossover]*</span>
+
+<span class="sd">  		| *for heuristic in offspring:*</span>
+
+<span class="sd">    			| *5% chance to mutate heuristic to another one*</span>
+
+<span class="sd">  		| *population.append(offspring)*</span>
 <span class="sd">       </span>
 <span class="sd">       &quot;&quot;&quot;</span>
 
-<span class="c1">#“Code is more often read than written.” --Guido Van Rossum</span>
+<span class="c1"># “Code is more often read than written.” --Guido Van Rossum</span>
 <span class="c1"># author : Simone Azeglio</span>
 
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -67,134 +73,131 @@
 <span class="kn">from</span> <span class="nn">algorithm</span> <span class="k">import</span> <span class="n">algorithm</span>
 
 
-
 <div class="viewcode-block" id="genetic"><a class="viewcode-back" href="../../index.html#algorithms.genetic.genetic">[docs]</a><span class="k">class</span> <span class="nc">genetic</span><span class="p">(</span><span class="n">algorithm</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;A class used to define the genetic algorithm:</span>
+    <span class="sd">&quot;&quot;&quot;A class used to define the genetic algorithm:</span>
 
-<span class="sd">	Attributes</span>
-<span class="sd">	----------</span>
-<span class="sd">	set_actions(str)</span>
-<span class="sd">       		list of possible actions the agent can take</span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    set_actions(str)</span>
+<span class="sd">        list of possible actions the agent can take</span>
 
-<span class="sd">       set_gen_size(int)</span>
-<span class="sd">       		Size of the generation, each generation is a list of strategies (t = towards the entity, the diamond ; r = random move).</span>
-<span class="sd">       		Each generation has 8 list strategies in this model</span>
+<span class="sd">    set_gen_size(int)</span>
+<span class="sd">        Size of the generation, each generation is a list of strategies (t = towards the entity, the diamond ; r = random move).</span>
+<span class="sd">        Each generation has 8 list strategies in this model</span>
 
-<span class="sd">       set_str_len(int)</span>
-<span class="sd">       		Length of the list, it starts with an average (gaussian distribution) of length 5</span>
+<span class="sd">    set_str_len(int)</span>
+<span class="sd">        Length of the list, it starts with an average (gaussian distribution) of length 5</span>
 
-<span class="sd">       set_sel_frac(double)</span>
-<span class="sd">       		Sets the selected fraction of the most 4 top high-scoring strings in order to generate strings in the next iteration</span>
+<span class="sd">    set_sel_frac(double)</span>
+<span class="sd">        Sets the selected fraction of the most 4 top high-scoring strings in order to generate strings in the next iteration</span>
 
-
-<span class="sd">       set_mut_prob(double)</span>
-<span class="sd">       		Mutation probability of the genetic algorithm (p = 0.05)</span>
+<span class="sd">    set_mut_prob(double)</span>
+<span class="sd">        Mutation probability of the genetic algorithm (p = 0.05)</span>
 
 <span class="sd">    Methods</span>
 <span class="sd">    -------</span>
 
-<span class="sd">       next_generation</span>
-<span class="sd">       		Creates next generation of strategies. It finds the best scores in the population, it selects the top 4 high-scoring strings</span>
-<span class="sd">       		in order to generate the next generation of strings.</span>
+<span class="sd">    next_generation</span>
+<span class="sd">        Creates next generation of strategies. It finds the best scores in the population, it selects the top 4 high-scoring strings</span>
+<span class="sd">        in order to generate the next generation of strings.</span>
 
-<span class="sd">       process_score(score)</span>
-<span class="sd">       		Keeps track of how the score changes and improves at each iteration</span>
+<span class="sd">    process_score(score)</span>
+<span class="sd">        Keeps track of how the score changes and improves at each iteration</span>
 
-<span class="sd">       get_action(obs)</span>
-<span class="sd">       		Returns an action based on observations and on a policy which considers the previous methods</span>
-
-
-<span class="sd">	&quot;&quot;&quot;</span>
-	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_actions</span><span class="p">,</span> <span class="n">set_gen_size</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">set_str_len</span><span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">set_sel_frac</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="n">set_mut_prob</span> <span class="o">=</span> <span class="o">.</span><span class="mi">05</span><span class="p">):</span>
-		<span class="nb">super</span><span class="p">(</span><span class="n">genetic</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">set_actions</span><span class="p">)</span>
-
-		<span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span> <span class="o">=</span> <span class="n">set_gen_size</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">str_len</span> <span class="o">=</span> <span class="n">set_str_len</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">selection_fraction</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">set_sel_frac</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span><span class="p">)</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">mutation_probability</span> <span class="o">=</span> <span class="n">set_mut_prob</span>
-
-		<span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">=</span> <span class="mi">0</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">move</span> <span class="o">=</span> <span class="mi">0</span>
-
-		<span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span>
-
-		<span class="bp">self</span><span class="o">.</span><span class="n">population</span> <span class="o">=</span> <span class="p">[]</span>
-		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span><span class="p">):</span>
-
-			<span class="n">gaussian_len</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">gauss</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">str_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">str_len</span> <span class="o">/</span> <span class="mf">2.5</span><span class="p">))</span>
-			<span class="k">if</span> <span class="n">gaussian_len</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-				<span class="n">gaussian_len</span> <span class="o">=</span> <span class="mi">1</span>
-
-			<span class="n">actions</span> <span class="o">=</span> <span class="p">[]</span>
-			<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">gaussian_len</span><span class="p">):</span>
-				<span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">possible_actions</span><span class="p">))</span>
-
-			<span class="bp">self</span><span class="o">.</span><span class="n">population</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
-
-<div class="viewcode-block" id="genetic.next_generation"><a class="viewcode-back" href="../../index.html#algorithms.genetic.genetic.next_generation">[docs]</a>	<span class="k">def</span> <span class="nf">next_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Creating next generation...&quot;</span><span class="p">)</span>
-		<span class="n">new_population</span> <span class="o">=</span> <span class="p">[]</span>
-		<span class="n">best_scores</span> <span class="o">=</span> <span class="p">[]</span>
-		<span class="n">fittest</span> <span class="o">=</span> <span class="p">[]</span>
-
-		<span class="c1">#find the best scores in the population</span>
-		<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">))):</span>
-			<span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection_fraction</span><span class="p">:</span>
-				<span class="k">break</span>
-			<span class="n">best_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-
-		<span class="c1">#now select every string in the population that has one of the best scores</span>
-		<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">population</span><span class="p">):</span>
-			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">in</span> <span class="n">best_scores</span><span class="p">:</span>
-				<span class="n">fittest</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
-
-		<span class="c1">#now generate the next generation of heuristic function strings</span>
-		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span><span class="p">):</span>
-			<span class="n">first_parent</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">fittest</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-			<span class="n">second_parent</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">fittest</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-
-			<span class="n">crossover</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
-			<span class="n">first_crossover</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">crossover</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">first_parent</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
-			<span class="n">second_crossover</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">crossover</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">second_parent</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
-
-			<span class="n">child</span> <span class="o">=</span> <span class="n">first_parent</span><span class="p">[:</span><span class="n">first_crossover</span><span class="p">]</span> <span class="o">+</span> <span class="n">second_parent</span><span class="p">[</span><span class="n">second_crossover</span><span class="p">:]</span>
-			<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">action</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">child</span><span class="p">):</span> <span class="c1"># small chance that the string will mutate</span>
-				<span class="n">will_mutate</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
-				<span class="k">if</span> <span class="n">will_mutate</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">mutation_probability</span><span class="p">:</span>
-					<span class="n">child</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">possible_actions</span><span class="p">)</span>
-
-			<span class="n">new_population</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
-
-		<span class="bp">self</span><span class="o">.</span><span class="n">population</span> <span class="o">=</span> <span class="n">new_population</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span>
-
-		<span class="k">return</span> <span class="n">fittest</span></div>
-
-<div class="viewcode-block" id="genetic.process_score"><a class="viewcode-back" href="../../index.html#algorithms.genetic.genetic.process_score">[docs]</a>	<span class="k">def</span> <span class="nf">process_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">score</span><span class="p">):</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span><span class="p">]</span> <span class="o">=</span> <span class="n">score</span>
-
-		<span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">move</span> <span class="o">=</span> <span class="mi">0</span>
-
-		<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Next action string: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">([</span><span class="n">f</span><span class="o">.</span><span class="vm">__name__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">population</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span><span class="p">]]))</span>
-
-		<span class="n">scores</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">population</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span><span class="p">])]</span>
-
-		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-			<span class="n">fittest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_generation</span><span class="p">()</span>
-			<span class="n">scores</span><span class="o">.</span><span class="n">extend</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">fittest</span><span class="p">])</span>
-
-		<span class="k">return</span> <span class="n">scores</span></div>
+<span class="sd">    get_action(obs)</span>
+<span class="sd">        Returns an action based on observations and on a policy which considers the previous methods</span>
 
 
-<div class="viewcode-block" id="genetic.get_action"><a class="viewcode-back" href="../../index.html#algorithms.genetic.genetic.get_action">[docs]</a>	<span class="k">def</span> <span class="nf">get_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs</span><span class="p">):</span>
-		<span class="n">policy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">population</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span><span class="p">]</span>
-		<span class="n">action</span> <span class="o">=</span> <span class="n">policy</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">move</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">policy</span><span class="p">)](</span><span class="n">obs</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-		<span class="bp">self</span><span class="o">.</span><span class="n">move</span> <span class="o">+=</span> <span class="mi">1</span>
-		<span class="k">return</span> <span class="n">action</span></div></div>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_actions</span><span class="p">,</span> <span class="n">set_gen_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">set_str_len</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">set_sel_frac</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">set_mut_prob</span><span class="o">=.</span><span class="mi">05</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">genetic</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">set_actions</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span> <span class="o">=</span> <span class="n">set_gen_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">str_len</span> <span class="o">=</span> <span class="n">set_str_len</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selection_fraction</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">set_sel_frac</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mutation_probability</span> <span class="o">=</span> <span class="n">set_mut_prob</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">population</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span><span class="p">):</span>
+
+            <span class="n">gaussian_len</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">gauss</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">str_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">str_len</span> <span class="o">/</span> <span class="mf">2.5</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">gaussian_len</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">gaussian_len</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="n">actions</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">gaussian_len</span><span class="p">):</span>
+                <span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">possible_actions</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">population</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
+
+<div class="viewcode-block" id="genetic.next_generation"><a class="viewcode-back" href="../../index.html#algorithms.genetic.genetic.next_generation">[docs]</a>    <span class="k">def</span> <span class="nf">next_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Creating next generation...&quot;</span><span class="p">)</span>
+        <span class="n">new_population</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">best_scores</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">fittest</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># find the best scores in the population</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">))):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection_fraction</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">best_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+        <span class="c1"># now select every string in the population that has one of the best scores</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">population</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">in</span> <span class="n">best_scores</span><span class="p">:</span>
+                <span class="n">fittest</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+        <span class="c1"># now generate the next generation of heuristic function strings</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span><span class="p">):</span>
+            <span class="n">first_parent</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">fittest</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">second_parent</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">fittest</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">crossover</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+            <span class="n">first_crossover</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">crossover</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">first_parent</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">second_crossover</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">crossover</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">second_parent</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+
+            <span class="n">child</span> <span class="o">=</span> <span class="n">first_parent</span><span class="p">[:</span><span class="n">first_crossover</span><span class="p">]</span> <span class="o">+</span> <span class="n">second_parent</span><span class="p">[</span><span class="n">second_crossover</span><span class="p">:]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">action</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">child</span><span class="p">):</span>  <span class="c1"># small chance that the string will mutate</span>
+                <span class="n">will_mutate</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">will_mutate</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">mutation_probability</span><span class="p">:</span>
+                    <span class="n">child</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">possible_actions</span><span class="p">)</span>
+
+            <span class="n">new_population</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">population</span> <span class="o">=</span> <span class="n">new_population</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span>
+
+        <span class="k">return</span> <span class="n">fittest</span></div>
+
+<div class="viewcode-block" id="genetic.process_score"><a class="viewcode-back" href="../../index.html#algorithms.genetic.genetic.process_score">[docs]</a>    <span class="k">def</span> <span class="nf">process_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">score</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span><span class="p">]</span> <span class="o">=</span> <span class="n">score</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Next action string: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="vm">__name__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">population</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span><span class="p">]]))</span>
+
+        <span class="n">scores</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">population</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span><span class="p">])]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">fittest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_generation</span><span class="p">()</span>
+            <span class="n">scores</span><span class="o">.</span><span class="n">extend</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">fittest</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">scores</span></div>
+
+<div class="viewcode-block" id="genetic.get_action"><a class="viewcode-back" href="../../index.html#algorithms.genetic.genetic.get_action">[docs]</a>    <span class="k">def</span> <span class="nf">get_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs</span><span class="p">):</span>
+        <span class="n">policy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">population</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation_size</span><span class="p">]</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">policy</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">move</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">policy</span><span class="p">)](</span><span class="n">obs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">move</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">action</span></div></div>
 </pre></div>
 
           </div>
@@ -203,7 +206,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../index.html">AgentNavigation</a></h1>
+<h1 class="logo"><a href="../../index.html">MineNavigation</a></h1>
 
 
 

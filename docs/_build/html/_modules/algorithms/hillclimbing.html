@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>algorithms.hillclimbing &#8212; AgentNavigation 1.0 documentation</title>
+    <title>algorithms.hillclimbing &#8212; MineNavigation 1.0 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -41,41 +41,42 @@
 <span class="sd">    After scoring every adjacent string, the algorithm chooses the string with the best score. It then explores the adjacent strings to that string,</span>
 <span class="sd">    choosing the best one of those, and so on. These incremental improvements allow the algorithm to find heuristic strings that produce higher and higher scores.</span>
 
-<span class="sd">    Added Simulated Annealing feature :</span>
-
+<span class="sd">    Added *Simulated Annealing* feature :</span>
 <span class="sd">    The purpose of this probabilistic behavior is to maximize the space that the hill-climbing algorithm explores.</span>
 <span class="sd">    Rather than sticking with whatever seems locally optimal,  the hill-climbing algorithm may find even better strings</span>
 <span class="sd">    in areas of the search space that, at first glance, seemed sub-optimal.</span>
 
-<span class="sd">    Pseudocode for hillclimbing:</span>
+<span class="sd">    **Pseudocode for hillclimbing:**</span>
 
-<span class="sd">        while True:</span>
-<span class="sd">            for string adjacent to current_string:</span>
-<span class="sd">                if score(string) &gt; score(current_string):</span>
-<span class="sd">                    best_string = string</span>
+<span class="sd">        *while True:*</span>
+<span class="sd">            *for string adjacent to current_string:*</span>
+<span class="sd">                *if score(string) &gt; score(current_string):*</span>
+<span class="sd">                    *best_string = string*</span>
 
-<span class="sd">            current_string = best_string</span>
+<span class="sd">            *current_string = best_string*</span>
 
 
-<span class="sd">    Pseudocode for Simulated Annealing:</span>
+<span class="sd">    **Pseudocode for Simulated Annealing:**</span>
 
-<span class="sd">        while True:</span>
-<span class="sd">            prob = probability that we choose a suboptimal choice</span>
-<span class="sd">            eps = random.random()</span>
-<span class="sd">            cooling_rate = 0.5</span>
+<span class="sd">        *while True:*</span>
+<span class="sd">            *prob = probability that we choose a suboptimal choice*</span>
 
-<span class="sd">            neighbors = every string adjacent to current_string</span>
+<span class="sd">            *eps = random.random()*</span>
 
-<span class="sd">            if eps &lt; p:</span>
-<span class="sd">                string = random.choice(neighbors)</span>
-<span class="sd">            else:</span>
-<span class="sd">                for string adjacent to current_string:</span>
-<span class="sd">                    if score(string) &gt; score(current_string):</span>
-<span class="sd">                         best_string = string</span>
+<span class="sd">            *cooling_rate = 0.5*</span>
 
-<span class="sd">                current_string = best_string</span>
+<span class="sd">            *neighbors = every string adjacent to current_string*</span>
 
-<span class="sd">                prob *= cooling_rate</span>
+<span class="sd">            *if eps &lt; p:*</span>
+<span class="sd">                *string = random.choice(neighbors)*</span>
+<span class="sd">            *else:*</span>
+<span class="sd">                *for string adjacent to current_string:*</span>
+<span class="sd">                    *if score(string) &gt; score(current_string):*</span>
+<span class="sd">                         *best_string = string*</span>
+
+<span class="sd">                *current_string = best_string*</span>
+
+<span class="sd">                *prob \*= cooling_rate*</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 
@@ -232,7 +233,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../index.html">AgentNavigation</a></h1>
+<h1 class="logo"><a href="../../index.html">MineNavigation</a></h1>
 
 
 

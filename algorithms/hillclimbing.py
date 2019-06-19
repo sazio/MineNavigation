@@ -1,3 +1,7 @@
+# “Code is more often read than written.” --Guido Van Rossum
+#  author : Simone Azeglio
+
+
 """ ***************
     hillclimbing.py
     ***************
@@ -8,47 +12,45 @@
     After scoring every adjacent string, the algorithm chooses the string with the best score. It then explores the adjacent strings to that string,
     choosing the best one of those, and so on. These incremental improvements allow the algorithm to find heuristic strings that produce higher and higher scores.
 
-    Added Simulated Annealing feature :
-
+    Added *Simulated Annealing* feature!
     The purpose of this probabilistic behavior is to maximize the space that the hill-climbing algorithm explores.
     Rather than sticking with whatever seems locally optimal,  the hill-climbing algorithm may find even better strings
     in areas of the search space that, at first glance, seemed sub-optimal.
 
-    Pseudocode for hillclimbing:
+    **Pseudocode for hillclimbing:**
 
-        while True:
-            for string adjacent to current_string:
-                if score(string) > score(current_string):
-                    best_string = string
+        *while True:*
+            *for string adjacent to current_string:*
+                *if score(string) > score(current_string):*
+                    *best_string = string*
 
-            current_string = best_string
+            *current_string = best_string*
 
 
-    Pseudocode for Simulated Annealing:
+    **Pseudocode for Simulated Annealing:**
 
-        while True:
-            prob = probability that we choose a suboptimal choice
-            eps = random.random()
-            cooling_rate = 0.5
+        *while True:*
+            *prob = probability that we choose a suboptimal choice*
 
-            neighbors = every string adjacent to current_string
+            *eps = random.random()*
 
-            if eps < p:
-                string = random.choice(neighbors)
-            else:
-                for string adjacent to current_string:
-                    if score(string) > score(current_string):
-                         best_string = string
+            *cooling_rate = 0.5*
 
-                current_string = best_string
+            *neighbors = every string adjacent to current_string*
 
-                prob *= cooling_rate
+            *if eps < p:*
+                *string = random.choice(neighbors)*
+            *else:*
+                *for string adjacent to current_string:*
+                    *if score(string) > score(current_string):*
+                         *best_string = string*
+
+                *current_string = best_string*
+
+                *prob \*= cooling_rate*
 
 """
 
-
-#“Code is more often read than written.” --Guido Van Rossum
-# author : Simone Azeglio
 
 import random
 

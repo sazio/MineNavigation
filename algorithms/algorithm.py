@@ -32,16 +32,16 @@ class algorithm():
     -------
         process_score(score)
         	*@abc.abstractmethod*
-        	After specifying the algorithm while running the program it process
-        	the score by following the current algorithm rule (genetic, hillclimb)
+        	After specifying the algorithm, while running the program, it processes
+        	the score by following the current algorithm rule (*genetic, hillclimb*)
 
         set_score(score)
         	When each run of a mission is ended it sets the score and it saves the score in a
-        	.csv file (useful for plotting the fitness function)
+        	*.csv* file (useful for plotting the fitness function)
 
         get_action(obs)
         	*@abc.abstractmethod*
-        	It gets the action that the agent has to perform from the specific algorithm (genetic, hillclimb)
+        	It gets the action that the agent has to perform from the specific algorithm (*genetic, hillclimb*)
 
 	"""
 	log_file = "" # static field, set in cli --> smth wrong with this
@@ -73,7 +73,7 @@ class algorithm():
 		args = parser.parse_args()
 		maze = cli.build_maze_filepath(args.maze)
 		alg = cli.get_algorithm(args.algorithm)
-		out_file = "/Users/simoneazeglio/MalmoPlatform/Python_Examples/Econofisica/source/logs/log_" + args.algorithm + "_" + ".csv"
+		out_file = "/Users/simoneazeglio/MalmoPlatform/Python_Examples/Econofisica/Project/logs/log_" + args.algorithm + "_" + ".csv"
 			# + str(time.time()) + ".csv"  #
 		if not os.path.exists("logs"):
 			os.makedirs("logs")
